@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\Weather\Core\WeatherServiceFactory;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
@@ -44,6 +45,9 @@ class Weather extends Command
             $this->error("Unsupported channel option {$channel}");
             return;
         }
+
+        $weatherService = WeatherServiceFactory::createService($provider);
+        $temperature = $weatherService->getCurrentWeather($city);
     }
 
     protected function promptForMissingArgumentsUsing()
