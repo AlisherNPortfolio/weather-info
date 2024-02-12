@@ -4,16 +4,16 @@ namespace App\Weather\Core;
 
 use Illuminate\Support\Str;
 
-class WeatherServiceFactory
+class WeatherProviderFactory
 {
     public static function createService(string $provider): IWeatherProvider
     {
-        $serviceClassName = Str::camel($provider) . "Provider";
-        $serviceClass = "App\\Weather\\Providers\\{$serviceClassName}";
+        $providerClassName = Str::camel($provider) . "Provider";
+        $providerClass = "App\\Weather\\Providers\\{$providerClassName}";
 
-        abort_if(!class_exists($serviceClass), 400, "Class does not exist");
+        abort_if(!class_exists($providerClass), 400, "Class does not exist");
 
-        return app($serviceClass);
+        return app($providerClass);
 
     }
 }
