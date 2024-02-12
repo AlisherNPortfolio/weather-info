@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Services\Weather\Core\WeatherServiceFactory;
+use App\Weather\Core\WeatherProviderFactory;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
@@ -36,7 +36,8 @@ class Weather extends Command
 
         $providersList = $this->getProviders();
 
-        if (!in_array($provider, $providersList)) {
+
+        if (!in_array(str_replace('-', '_', $provider), $providersList)) {
             $this->error("Unsupported provider {$provider}");
             return;
         }
@@ -46,8 +47,10 @@ class Weather extends Command
             return;
         }
 
-        $weatherService = WeatherServiceFactory::createService($provider);
-        $temperature = $weatherService->getCurrentWeather($city);
+        $weatherProvider = WeatherProviderFactory::createService($provider);
+        $temperature = $weatherProvider->getCurrentWeather($city);
+
+        // ... handling with channels tomorrow, Xudo xohlasa!
     }
 
     protected function promptForMissingArgumentsUsing()

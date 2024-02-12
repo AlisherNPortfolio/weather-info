@@ -3,6 +3,7 @@
 namespace App\Weather\Core;
 
 use Exception;
+use GuzzleHttp\Exception\ServerException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -42,12 +43,13 @@ abstract class WeatherProvider implements IWeatherProvider
         return $response->json();
     }
 
-    public function getCurrentWeather(string $city): int
+    public function getCurrentWeather(string $city): mixed
     {
         if (!$data = $this->getResponse()) {
-
+            throw new Exception('Can not get response from an API');
         }
-        return 1;
+
+        return $data;
     }
 
     abstract protected function setApiKey(): void;
