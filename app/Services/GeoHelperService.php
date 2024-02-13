@@ -1,39 +1,85 @@
 <?php
+namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 final class GeoHelperService
 {
-    private $api = "https://api.bigdatacloud.net/data/reverse-geocode-client";
+    private const API = "http://api.openweathermap.org/geo/1.0/direct?";
+
+    private $api;
 
     public string $lang = 'en';
 
-    public function __construct(private float $latitude, private float $longitude)
-    {}
-
-    public function getPlaceByCoordinates()
+    public function __construct()
     {
-        $query = $this->getQuery();
+        $this->api = self::API;
+    }
 
+    public function setBaseApiUser(): void
+    {
+        $this->api = self::API;
+        $this->setApiKey();
+    }
+
+    private function setApiKey(): void
+    {
+        $apiKey = env('OPEN_WEATHER_MAP_API_KEY');
+        $this->api .= "appid={$apiKey}";
+    }
+
+    public function setCoordinates(float $longitude, float $latitude): self
+    {
+        $this->setBaseApiUser();
+        $this->api .= "&lat={$latitude}&lon={$longitude}&limit=1";
+
+        return $this;
+    }
+
+    public  function  setCityName(string $city): self
+    {
+        $this->setBaseApiUser();
+        $this->api .= "&q={$city}";
+
+        return $this;
+    }
+
+    public function setLimit(int $limit = 1): self
+    {
+        $this->api .= "&limit={$limit}";
+
+        return $this;
+    }
+
+    private function getApiResponse(): mixed
+    {
         try {
-            $response = Http::get("{$this->api}?{$query}");
+            $response = Http::get($this->api);
 
             if ($response->ok()) {
-                return $response->json("city");
+                return $response->json();
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            Log::info("Error on getting response: " . $e->getMessage());
         }
 
         return false;
     }
 
-    private function getQuery()
+    public function getPlaceByCoordinates(float $longitude, float $latitude)
     {
-        $parameters = [
-            'latitude' => $this->latitude,
-            'longitude' => $this->longitude,
-            'localityLang' => $this->lang
-        ];
-        return http_build_query($parameters);
+        $this->setCoordinates($longitude, $latitude)
+            ->setLimit();
+
+        return $this->getApiResponse();
+    }
+
+    public function getCoordinatesByCity(string $city)
+    {
+        $this->setCityName($city)
+            ->setLimit();
+
+        return $this->getApiResponse();
     }
 }
