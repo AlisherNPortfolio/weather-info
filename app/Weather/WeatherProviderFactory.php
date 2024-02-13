@@ -12,8 +12,8 @@ class WeatherProviderFactory
         $providerClassName = Str::camel($provider).'Provider';
         $providerClass = "App\\Weather\\Providers\\{$providerClassName}";
 
-        abort_if(!class_exists($providerClass), 400, 'Class does not exist');
+        abort_if(!class_exists($providerClass), 404, 'Class does not exist');
 
-        return app($providerClass);
+        return new $providerClass($provider);
     }
 }

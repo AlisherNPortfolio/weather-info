@@ -50,6 +50,10 @@ class Weather extends Command
 
         $weatherProvider = WeatherProviderFactory::createService($provider);
         $temperature = $weatherProvider->getCurrentWeather($city);
+        if (!$temperature) {
+            $this->error("Can not get data from an API");
+            return;
+        }
 dd($temperature);
         // ... handling with channels tomorrow, Xudo xohlasa!
     }

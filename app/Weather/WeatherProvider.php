@@ -5,6 +5,7 @@ namespace App\Weather;
 use App\Weather\Contracts\IWeatherProvider;
 use Exception;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -17,19 +18,33 @@ abstract class WeatherProvider implements IWeatherProvider
 
     protected string $location;
 
+    final public function __construct(protected string $providerName)
+    {
+
+    }
+
     protected function getResponse()
     {
-        try {
-            $cacheTime = config('weather.cache_time');
-            $response = Cache::remember('weather_api_'.$this->apiKey, $cacheTime, function () {
-                return Http::get($this->api);
-            });
+        $cacheTime = config('weather.cache_time');
+        $cacheKey = "{$this->providerName}_{$this->location}";
 
-            if ($response->ok()) {
-                return $this->getData($response);
-            }
+        try {
+            // TODO: object caching-ni redis-ga o'tkazish
+            return Cache::remember($cacheKey, $cacheTime, function () use ($cacheKey) {
+                $response = Http::get($this->api);
+
+                if ($response->ok()) {
+                    return $this->getData($response);
+                } else {
+                    Log::info($response->reason());
+                    $this->clearCache($cacheKey);
+                }
+
+                return false;
+            });
         } catch (Exception $e) {
-            Log::error('Error on getting data from a weather API');
+            Log::info('Error on getting data from a weather API. ' . $e->getMessage());
+            $this->clearCache($cacheKey);
         }
 
         return false;
@@ -47,10 +62,15 @@ abstract class WeatherProvider implements IWeatherProvider
         $this->setApi();
 
         if (!$data = $this->getResponse()) {
-            throw new Exception('Can not get response from an API');
+            return false;
         }
 
         return $data;
+    }
+
+    private function clearCache(string $cacheKey): void
+    {
+        Cache::forget($cacheKey);
     }
 
     abstract protected function setApiKey(): void;
