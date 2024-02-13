@@ -36,15 +36,16 @@ abstract class WeatherProvider implements IWeatherProvider
                 if ($response->ok()) {
                     return $this->getData($response);
                 } else {
-                    Log::info($response->reason());
-                    $this->clearCache($cacheKey);
+                    $this->logOnError($response->reason(), $cacheKey);
                 }
 
                 return false;
             });
         } catch (Exception $e) {
-            Log::info('Error on getting data from a weather API. ' . $e->getMessage());
-            $this->clearCache($cacheKey);
+            $this->logOnError(
+                'Error on getting data from a weather API. ' . $e->getMessage(),
+                $cacheKey
+            );
         }
 
         return false;
@@ -71,6 +72,12 @@ abstract class WeatherProvider implements IWeatherProvider
     private function clearCache(string $cacheKey): void
     {
         Cache::forget($cacheKey);
+    }
+
+    protected function logOnError(string $errorMessage, string $cacheKey): void
+    {
+        Log::info('Error on getting data from a weather API. ' . $errorMessage);
+        $this->clearCache($cacheKey);
     }
 
     abstract protected function setApiKey(): void;
