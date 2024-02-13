@@ -50,15 +50,15 @@ class Weather extends Command
 
         $weatherProvider = WeatherProviderFactory::createService($provider);
         $temperature = $weatherProvider->getCurrentWeather($city);
-
+dd($temperature);
         // ... handling with channels tomorrow, Xudo xohlasa!
     }
 
     protected function promptForMissingArgumentsUsing()
     {
         return [
-            'provider' => ['Which weather provider do you want to use?', 'E.g. weather-api'],
-            'city' => ["For which city's weather information do you want to get?", 'E.g. Tashkent'],
+            'provider' => ['Qaysi ob-havo provideridan foydalanmoqchisiz?', 'M: weather-api'],
+            'city' => ["Qaysi shahar uchun ob-havo ma'lumotini olmoqchisiz?", 'M: Tashkent'],
         ];
     }
 
