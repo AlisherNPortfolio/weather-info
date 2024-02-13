@@ -24,7 +24,8 @@ abstract class WeatherProvider implements IWeatherProvider
     protected function getResponse()
     {
         try {
-            $response = Cache::remember('weather_api_'.$this->apiKey, 600, function () {
+            $cacheTime = config('weather.cache_time');
+            $response = Cache::remember('weather_api_'.$this->apiKey, $cacheTime, function () {
                 return Http::get($this->api);
             });
 
