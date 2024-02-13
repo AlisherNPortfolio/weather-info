@@ -27,7 +27,7 @@ The command receives three arguments:
 ## Usage examples
 
 * `php artisan weather weather-api Tashkent`
-* `php artisan weather visual-crossing Tashkent --option=email:ali1289445@gmail.com`
+* `php artisan weather visual-crossing Tashkent --option=email:anyemail@gmail.com`
 * `php artisan weather weather-api London --option=telegram:any_chat_id`
 
 Don't forget to run queue worker before using the command
