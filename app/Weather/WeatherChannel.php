@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Weather\Core;
+namespace App\Weather;
+
+use App\Weather\Contracts\IWeatherChannel;
 
 class WeatherChannel implements IWeatherChannel
 {
@@ -11,6 +13,6 @@ class WeatherChannel implements IWeatherChannel
 
     public function demonstrate(): void
     {
-        return $this->channel->demonstrate();
+        $this->channel->demonstrate();
     }
 }
