@@ -9,6 +9,6 @@ class ConsoleChannel extends WeatherChannel implements IWeatherChannel
 {
     public function demonstrate(float $temperature, string $city, string $channel = null): void
     {
-        $this->console->writeln("<fg=white;bg=green>The temperature is {$temperature} deegree(s) in {$city}</>");
+        $this->console->writeln("<fg=white;bg=green>The temperature is {$temperature}°С in {$city}</>");
     }
 }

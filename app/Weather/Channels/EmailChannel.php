@@ -2,11 +2,12 @@
 
 namespace App\Weather\Channels;
 
-use App\Mail\WeatherMail;
+use App\Jobs\SendWeatherToEmail;
 use App\Weather\Contracts\IWeatherChannel;
 use App\Weather\WeatherChannel;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
+
+;
 
 class EmailChannel extends WeatherChannel implements IWeatherChannel
 {
@@ -17,11 +18,12 @@ class EmailChannel extends WeatherChannel implements IWeatherChannel
             'city' => $city
         ];
 
-        if (Mail::to($channel)->send(new WeatherMail($weatherData))) {
+        try {
+            SendWeatherToEmail::dispatch($weatherData, $channel);
             $this->console->write("<fg=white;bg=green>Email sent</>");
-        } else {
+        } catch (\Exception $e) {
             $this->console->write("<error>Email could not be sent!</error>");
+            Log::info('Error on sending to email: ' . $e->getMessage());
         }
-
     }
 }
