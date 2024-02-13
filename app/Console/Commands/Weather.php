@@ -62,14 +62,6 @@ class Weather extends Command
         $weatherChannel->demonstrate($temperature, $city, $channelValue);
     }
 
-    protected function promptForMissingArgumentsUsing(): array
-    {
-        return [
-            'provider' => ['Qaysi ob-havo provideridan foydalanmoqchisiz?', 'M: weather-api'],
-            'city' => ["Qaysi shahar uchun ob-havo ma'lumotini olmoqchisiz?", 'M: Tashkent'],
-        ];
-    }
-
     private function getProviders(): array
     {
         $providersInConfig = config('weather.api_key');
