@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Weather\WeatherChannelFactory;
 use App\Weather\WeatherProviderFactory;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
@@ -9,7 +10,7 @@ use Illuminate\Support\Str;
 class Weather extends Command
 {
     private array $availableChannels = [
-        'console', 'telegram', 'mail',
+        'console', 'telegram', 'email',
     ];
     /**
      * The name and signature of the console command.
@@ -28,7 +29,7 @@ class Weather extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $provider = $this->argument('provider');
         $city = $this->argument('city');
@@ -42,23 +43,27 @@ class Weather extends Command
             return;
         }
 
-        if (!in_array($channel, $this->availableChannels)) {
-            $this->error("Unsupported channel option {$channel}");
+        [$channelName, $channelValue] = $this->getChannelData($channel);
+
+        if (!in_array($channelName, $this->availableChannels)) {
+            $this->error("Unsupported channel option {$channelName}");
 
             return;
         }
 
         $weatherProvider = WeatherProviderFactory::createProvider($provider);
         $temperature = $weatherProvider->getCurrentWeather($city);
+
         if (!$temperature) {
             $this->error("Can not get data from an API");
             return;
         }
-dd($temperature);
-        // ... handling with channels tomorrow, Xudo xohlasa!
+
+        $weatherChannel = WeatherChannelFactory::createChannel($channelName);
+        $weatherChannel->demonstrate($temperature, $city, $channelValue);
     }
 
-    protected function promptForMissingArgumentsUsing()
+    protected function promptForMissingArgumentsUsing(): array
     {
         return [
             'provider' => ['Qaysi ob-havo provideridan foydalanmoqchisiz?', 'M: weather-api'],
@@ -66,7 +71,7 @@ dd($temperature);
         ];
     }
 
-    private function getProviders()
+    private function getProviders(): array
     {
         $providersInConfig = config('weather.api_key');
 
@@ -77,5 +82,18 @@ dd($temperature);
         }
 
         return [];
+    }
+
+    private function getChannelData(string $channel): array
+    {
+        $channel = explode(":", $channel);
+        $channelName = $channel[0];
+        $channelValue = null;
+
+        if (isset($channel[1])) {
+            $channelValue = $channel[1];
+        }
+
+        return [$channelName, $channelValue];
     }
 }

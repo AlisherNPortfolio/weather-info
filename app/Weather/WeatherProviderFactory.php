@@ -14,6 +14,6 @@ class WeatherProviderFactory
 
         abort_if(!class_exists($providerClass), 404, 'Class does not exist');
 
-        return new $providerClass($provider);
+        return app($providerClass, ['providerName' => $provider]);
     }
 }
