@@ -9,7 +9,7 @@ class WeatherProviderFactory
 {
     public static function createProvider(string $provider): IWeatherProvider
     {
-        $providerClassName = Str::camel($provider).'Provider';
+        $providerClassName = Str::studly($provider).'Provider';
         $providerClass = "App\\Weather\\Providers\\{$providerClassName}";
 
         abort_if(!class_exists($providerClass), 404, 'Class does not exist');

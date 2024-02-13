@@ -17,7 +17,7 @@ class Weather extends Command
      *
      * @var string
      */
-    protected $signature = 'weather {provider} {city} {--channel=console}';
+    protected $signature = 'weather {provider?} {city?} {--channel=console}';
 
     /**
      * The console command description.
@@ -31,13 +31,12 @@ class Weather extends Command
      */
     public function handle(): void
     {
-        $provider = $this->argument('provider');
-        $city = $this->argument('city');
+        $providersList = $this->getProviders();
+        $provider = $this->argument('provider') ?? $this->choice("You didn't give provider name. Choose one of the following provider list", $providersList);
+        $city = $this->argument('city') ?? $this->ask("Which city's weather do you want to know? Write city name");
         $channel = $this->option('channel');
 
-        $providersList = $this->getProviders();
-
-        if (!in_array(str_replace('-', '_', $provider), $providersList)) {
+        if (!in_array($provider, $providersList)) {
             $this->error("Unsupported provider {$provider}");
 
             return;
@@ -77,7 +76,7 @@ class Weather extends Command
 
         if ($providersInConfig && is_array($providersInConfig) && count($providersInConfig) > 0) {
             return array_map(function ($provider) {
-                return Str::snake($provider);
+                return str_replace('_', '-', $provider);
             }, array_keys($providersInConfig));
         }
 
