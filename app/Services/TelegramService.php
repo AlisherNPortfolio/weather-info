@@ -27,7 +27,7 @@ class TelegramService
 
     public function getUrl(): string
     {
-        $botId = env('TELEGRAM_BOT_ID');
+        $botId = config('weather.bot_id');
 
         return self::BASE_URL . $botId . '/' . self::ACTION;
     }
@@ -36,7 +36,7 @@ class TelegramService
     {
         try {
             $url = $this->getUrl();
-            $query = $this->buildQuery($message);//dd("{$url}?$query");
+            $query = $this->buildQuery($message);
             $response = Http::get("{$url}?$query");
 
             if ($response->ok()) {

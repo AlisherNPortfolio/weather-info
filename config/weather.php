@@ -7,4 +7,5 @@ return [
         'weather_bit' => env('WEATHERBIT_API_KEY'),
     ],
     'cache_time' => 600,
+    'bot_id' => env('TELEGRAM_BOT_ID')
 ];
