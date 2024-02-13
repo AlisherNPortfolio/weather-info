@@ -13,6 +13,6 @@ class VisualCrossingProvider extends WeatherProvider
 
     protected function setApi(): void
     {
-        $this->api = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Tashkent?unitGroup=metric&include=current&key={$this->apiKey}&contentType=json";
+        $this->api = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{$this->location}?unitGroup=metric&include=current&key={$this->apiKey}&contentType=json";
     }
 }

@@ -15,6 +15,8 @@ abstract class WeatherProvider implements IWeatherProvider
 
     protected string $api;
 
+    protected string $location;
+
     public function __construct()
     {
         $this->setApiKey();
@@ -46,6 +48,8 @@ abstract class WeatherProvider implements IWeatherProvider
 
     public function getCurrentWeather(string $city): mixed
     {
+        $this->location = $city;
+
         if (!$data = $this->getResponse()) {
             throw new Exception('Can not get response from an API');
         }
