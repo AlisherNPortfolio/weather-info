@@ -48,7 +48,7 @@ class Weather extends Command
             return;
         }
 
-        $weatherProvider = WeatherProviderFactory::createService($provider);
+        $weatherProvider = WeatherProviderFactory::createProvider($provider);
         $temperature = $weatherProvider->getCurrentWeather($city);
         if (!$temperature) {
             $this->error("Can not get data from an API");

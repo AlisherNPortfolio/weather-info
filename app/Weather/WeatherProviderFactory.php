@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 
 class WeatherProviderFactory
 {
-    public static function createService(string $provider): IWeatherProvider
+    public static function createProvider(string $provider): IWeatherProvider
     {
         $providerClassName = Str::camel($provider).'Provider';
         $providerClass = "App\\Weather\\Providers\\{$providerClassName}";
