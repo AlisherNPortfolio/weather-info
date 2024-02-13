@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Weather\Core;
+namespace App\Weather;
 
+use App\Weather\Contracts\IWeatherProvider;
 use Exception;
-use GuzzleHttp\Exception\ServerException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -24,7 +24,7 @@ abstract class WeatherProvider implements IWeatherProvider
     protected function getResponse()
     {
         try {
-            $response = Cache::remember('weather_api_' . $this->apiKey, 600, function () {
+            $response = Cache::remember('weather_api_'.$this->apiKey, 600, function () {
                 return Http::get($this->api);
             });
 

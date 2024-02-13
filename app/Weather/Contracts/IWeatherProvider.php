@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Weather\Core;
+namespace App\Weather\Contracts;
 
 interface IWeatherProvider
 {

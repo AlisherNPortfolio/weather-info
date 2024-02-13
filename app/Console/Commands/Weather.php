@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Weather\Core\WeatherProviderFactory;
+use App\Weather\WeatherProviderFactory;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
@@ -36,14 +36,15 @@ class Weather extends Command
 
         $providersList = $this->getProviders();
 
-
         if (!in_array(str_replace('-', '_', $provider), $providersList)) {
             $this->error("Unsupported provider {$provider}");
+
             return;
         }
 
         if (!in_array($channel, $this->availableChannels)) {
             $this->error("Unsupported channel option {$channel}");
+
             return;
         }
 

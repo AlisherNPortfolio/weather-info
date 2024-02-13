@@ -2,7 +2,7 @@
 
 namespace App\Weather\Providers;
 
-use App\Weather\Core\WeatherProvider;
+use App\Weather\WeatherProvider;
 
 class WeatherApiProvider extends WeatherProvider
 {
