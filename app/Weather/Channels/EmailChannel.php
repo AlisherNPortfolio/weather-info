@@ -7,12 +7,16 @@ use App\Weather\Contracts\IWeatherChannel;
 use App\Weather\WeatherChannel;
 use Illuminate\Support\Facades\Log;
 
-;
-
 class EmailChannel extends WeatherChannel implements IWeatherChannel
 {
+    protected static $channelName = "Email";
+
     public function demonstrate(float $temperature, string $city, string $channel = null): void
     {
+        if (!$this->hasChannelValue($channel)) {
+            return;
+        }
+
         $weatherData = [
             'temperature' => $temperature,
             'city' => $city

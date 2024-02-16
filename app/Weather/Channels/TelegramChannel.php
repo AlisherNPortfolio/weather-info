@@ -8,11 +8,16 @@ use Illuminate\Support\Facades\Log;
 
 class TelegramChannel extends WeatherChannel implements IWeatherChannel
 {
+    protected static $channelName = "Telegram";
     private string $telegramApi = "https://api.telegram.org/bot";
 
     private string $action = "sendMessage";
     public function demonstrate(float $temperature, string $city, string $channel = null): void
     {
+        if (!$this->hasChannelValue($channel)) {
+            return;
+        }
+
         $today = date('d-m-Y');
         $message = "<b>Today's current temperature ({$today})</b>" . PHP_EOL .
                     "<b>City Name</b>: {$city}" . PHP_EOL .
