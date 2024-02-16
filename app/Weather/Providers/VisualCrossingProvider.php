@@ -17,8 +17,8 @@ class VisualCrossingProvider extends WeatherProvider
         $this->api = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{$this->location}?unitGroup=metric&include=current&key={$this->apiKey}&contentType=json";
     }
 
-    protected function getData(Response $response): mixed
+    protected function getData(array $response): mixed
     {
-        return  $response->json('currentConditions')['temp'];
+        return  $response['currentConditions']['temp'];
     }
 }

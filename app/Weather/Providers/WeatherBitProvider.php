@@ -22,10 +22,8 @@ class WeatherBitProvider extends WeatherProvider
         $this->api = "https://api.weatherbit.io/v2.0/current?lat={$lat}&lon={$lon}&key={$this->apiKey}";
     }
 
-    protected function getData(Response $response): mixed
+    protected function getData(array $response): mixed
     {
-        $data = $response->json('data');
-
-        return $data[0]['temp'];
+        return $response['data'][0]['temp'];
     }
 }

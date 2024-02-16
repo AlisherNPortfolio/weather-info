@@ -6,6 +6,7 @@ use App\Weather\WeatherChannelFactory;
 use App\Weather\WeatherProviderFactory;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Exception\RunCommandFailedException;
 
 class Weather extends Command
 {
@@ -36,30 +37,34 @@ class Weather extends Command
         $city = $this->argument('city') ?? $this->ask("Which city's weather do you want to know? Write city name");
         $channel = $this->option('channel');
 
-        if (!in_array($provider, $providersList)) {
-            $this->error("Unsupported provider {$provider}");
+        try {
+            if (!in_array($provider, $providersList)) {
+                $this->error("Unsupported provider {$provider}");
 
-            return;
+                return;
+            }
+
+            [$channelName, $channelValue] = $this->getChannelData($channel);
+
+            if (!in_array($channelName, $this->availableChannels)) {
+                $this->error("Unsupported channel option {$channelName}");
+
+                return;
+            }
+
+            $weatherProvider = WeatherProviderFactory::createProvider($provider);
+            $temperature = $weatherProvider->getCurrentWeather($city);
+
+            if (!$temperature) {
+                $this->error("Can not get data from an API");
+                return;
+            }
+
+            $weatherChannel = WeatherChannelFactory::createChannel($channelName);
+            $weatherChannel->demonstrate($temperature, $city, $channelValue);
+        } catch (\Exception | \Error $e) {
+            $this->error("Unexpected exception: " . $e->getMessage());
         }
-
-        [$channelName, $channelValue] = $this->getChannelData($channel);
-
-        if (!in_array($channelName, $this->availableChannels)) {
-            $this->error("Unsupported channel option {$channelName}");
-
-            return;
-        }
-
-        $weatherProvider = WeatherProviderFactory::createProvider($provider);
-        $temperature = $weatherProvider->getCurrentWeather($city);
-
-        if (!$temperature) {
-            $this->error("Can not get data from an API");
-            return;
-        }
-
-        $weatherChannel = WeatherChannelFactory::createChannel($channelName);
-        $weatherChannel->demonstrate($temperature, $city, $channelValue);
     }
 
     private function getProviders(): array

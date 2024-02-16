@@ -2,13 +2,13 @@
 
 namespace App\Weather;
 
+use App\Services\RedisCacheService;
 use App\Weather\Contracts\IWeatherProvider;
 use Exception;
-use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 abstract class WeatherProvider implements IWeatherProvider
 {
@@ -18,9 +18,11 @@ abstract class WeatherProvider implements IWeatherProvider
 
     protected string $location;
 
+    protected ConsoleOutput $consoleOutput;
+
     final public function __construct(protected string $providerName)
     {
-
+        $this->consoleOutput = new ConsoleOutput();
     }
 
     protected function getResponse()
@@ -29,31 +31,33 @@ abstract class WeatherProvider implements IWeatherProvider
         $cacheKey = "{$this->providerName}_{$this->location}";
 
         try {
-            // TODO: object caching-ni redis-ga o'tkazish
-            return Cache::remember($cacheKey, $cacheTime, function () use ($cacheKey) {
-                $response = Http::get($this->api);
-
-                if ($response->ok()) {
-                    return $this->getData($response);
-                } else {
-                    $this->logOnError($response->reason(), $cacheKey);
-                }
-
-                return false;
+            [$response, $responseOk, $responseReason] = RedisCacheService::cacheHttpGet($cacheKey, $cacheTime, function () {
+                return Http::get($this->api);
             });
+
+
+            if ($responseOk) {
+                return $this->getData($response);
+            } else {
+                $this->consoleOutput->write("<error>{$responseReason}</error>");
+                $this->logOnError($responseReason, $cacheKey);
+            }
+
         } catch (Exception $e) {
+            $message = 'Error on getting data from a weather API. ' . $e->getMessage() . " " . $e->getLine() . " ". $e->getFile();
             $this->logOnError(
-                'Error on getting data from a weather API. ' . $e->getMessage(),
+                $message,
                 $cacheKey
             );
+            $this->consoleOutput->write("<error>" . $message . "</error>");
         }
 
         return false;
     }
 
-    protected function getData(Response $response): mixed
+    protected function getData(array $response): mixed
     {
-        return $response->json();
+        return $response;
     }
 
     public function getCurrentWeather(string $city): mixed
