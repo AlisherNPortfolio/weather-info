@@ -1,4 +1,4 @@
-# Task for Job opportunity (for "Click")
+# Get weather information about given location using artisan cli
 
 This is a console project that gets current weather information of any city over the world and displays it in the console or sends it to given email/telegram chat.
 
